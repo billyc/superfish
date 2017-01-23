@@ -9,9 +9,10 @@ from urllib.request import Request, urlopen
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 
-watch_folder = 'onSite'
-save_folder = 'edited'
+watch_folder = 'TestData'
 api_key = os.environ['FISH_API_KEY']
+
+save_folder  = watch_folder + '/output'
 
 fish_url = 'https://private-anon-f9a54eb248-fishnflrdq.apiary-mock.com/content/hostname/rdq/v3/prod'
 #fish_url = 'https://fishapi.fishsoftware.com/content/hostname/rdq/v3/prod'
@@ -19,7 +20,10 @@ fish_url = 'https://private-anon-f9a54eb248-fishnflrdq.apiary-mock.com/content/h
 
 class FileEvent(FileSystemEventHandler):
     def on_modified(self, event):
-        process_file(event.src_path)
+        if event.is_directory:
+            return
+        else:
+            process_file(event.src_path)
 
 
 def fetch_details(badge_id):
@@ -42,8 +46,8 @@ def process_file(src_path):
     with open(src_path, 'r', encoding='utf-8') as f:
         try:
             data = json.load(f)
-            badge_id = data['BadgeID']
-            del data['BadgeID']
+            badge_id = data['badgeID']
+            del data['badgeID']
 
             details = fetch_details(badge_id)
             for k,v in details.items():
