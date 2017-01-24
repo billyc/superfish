@@ -1,11 +1,13 @@
 # SUPERFLUFFY (c) 2017 Billy Charlton <billy@okbecause.com>
+from __future__ import print_function
+
 import sys
 import time
 import logging
 import json
 import os
 import ntpath
-from urllib.request import Request, urlopen
+from urllib2 import Request, urlopen
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 
@@ -14,8 +16,8 @@ api_key = os.environ['FISH_API_KEY']
 
 save_folder  = watch_folder + '/output'
 
-fish_url = 'https://private-anon-f9a54eb248-fishnflrdq.apiary-mock.com/content/hostname/rdq/v3/prod'
-#fish_url = 'https://fishapi.fishsoftware.com/content/hostname/rdq/v3/prod'
+#fish_url = 'https://private-anon-f9a54eb248-fishnflrdq.apiary-mock.com/content/hostname/rdq/v3/prod'
+fish_url =  'https://fishapi.fishsoftware.com/content/superbowlli/rdq/v3/prod'
 
 
 class FileEvent(FileSystemEventHandler):
@@ -27,11 +29,11 @@ class FileEvent(FileSystemEventHandler):
 
 
 def fetch_details(badge_id):
-    payload = '{"auth_id" : ' + api_key + ', "badge_id": ' + badge_id + '}'
+    payload = '{"auth_id" : "' + api_key + '", "badge_id": "' + badge_id + '"}'
     headers = {'Content-Type': 'application/json'}
 
-    request = Request(fish_url, data=payload.encode('utf-8'), headers=headers)
-    response_body = urlopen(request).read().decode('utf-8')
+    request = Request(fish_url, data=payload, headers=headers)
+    response_body = urlopen(request).read()
     jbody = json.loads(response_body, encoding='utf-8')
 
     result = {}
@@ -43,7 +45,7 @@ def fetch_details(badge_id):
 
 
 def process_file(src_path):
-    with open(src_path, 'r', encoding='utf-8') as f:
+    with open(src_path, 'r') as f:
         try:
             data = json.load(f)
             badge_id = data['badgeID']
